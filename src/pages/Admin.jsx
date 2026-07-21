@@ -107,6 +107,7 @@ export default function Admin() {
   const [newEstName, setNewEstName] = useState("");
   const [newEstCode, setNewEstCode] = useState("");
   const [addingEst, setAddingEst] = useState(false);
+  const [addEstError, setAddEstError] = useState(null);
   const [importTarget, setImportTarget] = useState("");
   const [superExamSettings, setSuperExamSettings] = useState({});
   const [savingSuperExam, setSavingSuperExam] = useState(null);
@@ -199,14 +200,16 @@ export default function Admin() {
   }
 
   async function handleAddEstablishment() {
+    if (!newEstName.trim() || !newEstCode.trim() || addingEst) return;
     setAddingEst(true);
+    setAddEstError(null);
     try {
       await addEstablishment(newEstName, newEstCode);
       setNewEstName("");
       setNewEstCode("");
       setRefresh((r) => r + 1);
     } catch (err) {
-      alert(err.message);
+      setAddEstError(err.message);
     }
     setAddingEst(false);
   }
@@ -479,32 +482,43 @@ export default function Admin() {
       {isSuperAdmin ? (
         <>
           <h2 className="section-title" style={{ marginTop: 0 }}>Gestion des établissements</h2>
-          <div className="card" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div className="card" style={{ display: "flex", flexDirection: "column", gap: 16, padding: "20px 22px" }}>
             <p style={{ margin: 0, fontSize: 13.5, color: "var(--grey)" }}>
               Ajoutez un établissement avec son propre code d'accès formateur/directeur. Il apparaîtra aussitôt dans la liste déroulante de la page de connexion et dans la grille des épreuves ci-dessous.
             </p>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <input
-                placeholder="Nom de l'établissement"
-                value={newEstName}
-                onChange={(e) => setNewEstName(e.target.value)}
-                style={{ flex: "2 1 280px" }}
-              />
-              <input
-                placeholder="Code d'accès (ex. : MONETAB2026)"
-                value={newEstCode}
-                onChange={(e) => setNewEstCode(e.target.value)}
-                style={{ flex: "1 1 180px" }}
-              />
+            <div className="add-form">
+              <div className="field">
+                <label htmlFor="new-est-name">Nom de l'établissement</label>
+                <input
+                  id="new-est-name"
+                  placeholder="Ex. : INSTITUT SPECIALISE..."
+                  value={newEstName}
+                  onChange={(e) => { setNewEstName(e.target.value); setAddEstError(null); }}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddEstablishment()}
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="new-est-code">Code d'accès</label>
+                <input
+                  id="new-est-code"
+                  placeholder="Ex. : MONETAB2026"
+                  value={newEstCode}
+                  onChange={(e) => { setNewEstCode(e.target.value); setAddEstError(null); }}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddEstablishment()}
+                />
+              </div>
               <button
                 type="button"
                 className="btn"
                 disabled={!newEstName.trim() || !newEstCode.trim() || addingEst}
                 onClick={handleAddEstablishment}
               >
-                {addingEst ? "Ajout…" : "+ Ajouter"}
+                {addingEst ? "Ajout…" : "➕ Ajouter"}
               </button>
             </div>
+            {addEstError && (
+              <p style={{ margin: 0, fontSize: 13, color: "var(--red)" }}>{addEstError}</p>
+            )}
             {establishmentsLoading ? (
               <div className="empty">Chargement…</div>
             ) : (
@@ -540,8 +554,8 @@ export default function Admin() {
                       <th key={e.id} style={{ textAlign: "center" }}>
                         {e.short}
                         <div style={{ display: "flex", gap: 4, justifyContent: "center", marginTop: 4 }}>
-                          <button type="button" className="btn ghost btn-sm" onClick={() => bulkSetExam(e.id, true)}>Tout activer</button>
-                          <button type="button" className="btn ghost btn-sm" onClick={() => bulkSetExam(e.id, false)}>Tout masquer</button>
+                          <button type="button" className="btn ghost btn-sm" style={{ color: "#fff" }} onClick={() => bulkSetExam(e.id, true)}>Tout activer</button>
+                          <button type="button" className="btn ghost btn-sm" style={{ color: "#fff" }} onClick={() => bulkSetExam(e.id, false)}>Tout masquer</button>
                         </div>
                       </th>
                     ))}

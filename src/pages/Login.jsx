@@ -6,6 +6,7 @@ import { getExamSettings } from "../lib/examSettings";
 import { getStudentByCin, upsertStudent } from "../lib/students";
 import { ESTABLISHMENTS_WITH_OTHER, OTHER_OPTION } from "../lib/establishments";
 import { getEstablishmentNames } from "../lib/establishmentsAdmin";
+import { getSession } from "../lib/session";
 import Brand from "../components/Brand";
 
 const ALL_ENABLED = Object.fromEntries(Object.keys(EXAMS).map((id) => [id, true]));
@@ -27,6 +28,7 @@ export default function Login() {
   const [visitorMode, setVisitorMode] = useState(false);
   const [nom, setNom] = useState("");
   const [groupe, setGroupe] = useState("");
+  const [reuseSession, setReuseSession] = useState(false);
   const [examId, setExamId] = useState(DEFAULT_EXAM);
   const [examEnabled, setExamEnabled] = useState(ALL_ENABLED);
   const nav = useNavigate();
@@ -46,6 +48,25 @@ export default function Login() {
       if (active) setEtablissementOptions([...names, OTHER_OPTION]);
     });
     return () => { active = false; };
+  }, []);
+
+  // Un candidat déjà connecté (session active) peut relancer un entraînement
+  // sans ressaisir son CIN ni ses informations : on réutilise sa session.
+  useEffect(() => {
+    const existing = getSession();
+    if (existing.type !== "candidate" || !existing.nom) return;
+    setEtablissement(existing.etablissement || ESTABLISHMENTS_WITH_OTHER[0]);
+    setNom(existing.nom || "");
+    setGroupe(existing.groupe || "");
+    if (existing.examId) setExamId(existing.examId);
+    if (existing.cin) {
+      setCin(existing.cin);
+      setCinStatus("found");
+    } else {
+      setVisitorMode(true);
+    }
+    setReuseSession(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -71,17 +92,6 @@ export default function Login() {
 
   useEffect(() => clearLookupTimer, []);
 
-  function changeEtablissement(value) {
-    lookupToken.current++; // annule toute recherche CIN en cours pour l'ancien établissement
-    clearLookupTimer();
-    setEtablissement(value);
-    setCin("");
-    setCinStatus("idle");
-    setVisitorMode(false);
-    setNom("");
-    setGroupe("");
-  }
-
   function changeCin(value) {
     setCin(value);
     if (visitorMode) setVisitorMode(false);
@@ -93,6 +103,16 @@ export default function Login() {
     setCin("");
     setCinStatus("idle");
     setVisitorMode(true);
+    setNom("");
+    setGroupe("");
+  }
+
+  function switchIdentity() {
+    clearLookupTimer();
+    setReuseSession(false);
+    setCin("");
+    setCinStatus("idle");
+    setVisitorMode(false);
     setNom("");
     setGroupe("");
   }
@@ -169,50 +189,51 @@ export default function Login() {
             <p>Préparez l'examen de fin de formation dans les conditions réelles.</p>
           </div>
           <div className="login-body">
-            <div className="field">
-              <label htmlFor="etablissement">Établissement</label>
-              <select
-                id="etablissement"
-                value={etablissement}
-                onChange={(e) => changeEtablissement(e.target.value)}
-              >
-                {etablissementOptions.map((e) => (
-                  <option key={e} value={e}>{e}</option>
-                ))}
-              </select>
-            </div>
-
-            {!visitorMode && (
+            {reuseSession && (
               <div className="field">
-                <label htmlFor="cin">CIN (carte d'identité nationale)</label>
-                <input
-                  id="cin"
-                  value={cin}
-                  onChange={(e) => changeCin(e.target.value)}
-                  onKeyUp={(e) => e.key !== "Enter" && scheduleLookup(e.target.value)}
-                  onBlur={() => lookupCin()}
-                  onKeyDown={(e) => e.key === "Enter" && lookupCin()}
-                  placeholder="Ex. : AB123456"
-                  autoFocus
-                />
-                {cinStatus !== "idle" && (
-                  <p
-                    style={{
-                      marginTop: 6,
-                      fontSize: 12.5,
-                      color: cinStatus === "found" || cinStatus === "switched" ? "var(--good)" : "var(--grey)",
-                    }}
-                  >
-                    {CIN_STATUS_TEXT[cinStatus]}
-                  </p>
-                )}
-                <button type="button" className="btn grey btn-sm" onClick={continueAsVisitor} style={{ marginTop: 6 }}>
-                  Continuer comme visiteur
-                </button>
+                <p style={{ marginTop: 0, fontSize: 12.5, color: "var(--grey)" }}>
+                  ✔ Session active — connecté en tant que <strong>{nom}</strong> —{" "}
+                  <button type="button" className="about-trigger" onClick={switchIdentity}>
+                    ce n'est pas moi
+                  </button>
+                </p>
               </div>
             )}
 
-            {visitorMode && (
+            {!reuseSession && !visitorMode && (
+              <>
+                <div className="field">
+                  <label htmlFor="cin">CIN (carte d'identité nationale)</label>
+                  <input
+                    id="cin"
+                    value={cin}
+                    onChange={(e) => changeCin(e.target.value)}
+                    onKeyUp={(e) => e.key !== "Enter" && scheduleLookup(e.target.value)}
+                    onBlur={() => lookupCin()}
+                    onKeyDown={(e) => e.key === "Enter" && lookupCin()}
+                    placeholder="Ex. : AB123456"
+                    autoFocus
+                  />
+                  {cinStatus !== "idle" && (
+                    <p
+                      style={{
+                        marginTop: 6,
+                        fontSize: 12.5,
+                        color: cinStatus === "found" || cinStatus === "switched" ? "var(--good)" : "var(--grey)",
+                      }}
+                    >
+                      {CIN_STATUS_TEXT[cinStatus]}
+                    </p>
+                  )}
+                </div>
+                <div className="or-divider">ou</div>
+                <button type="button" className="btn grey btn-block" onClick={continueAsVisitor}>
+                  <span aria-hidden="true">👤</span> Continuer comme visiteur
+                </button>
+              </>
+            )}
+
+            {!reuseSession && visitorMode && (
               <div className="field">
                 <p style={{ marginTop: 0, fontSize: 12.5, color: "var(--grey)" }}>
                   Mode visiteur —{" "}
@@ -225,6 +246,18 @@ export default function Login() {
 
             {showDetails && (
               <>
+                <div className="field">
+                  <label htmlFor="etablissement">Établissement</label>
+                  <select
+                    id="etablissement"
+                    value={etablissement}
+                    onChange={(e) => setEtablissement(e.target.value)}
+                  >
+                    {etablissementOptions.map((e) => (
+                      <option key={e} value={e}>{e}</option>
+                    ))}
+                  </select>
+                </div>
                 <div className="field">
                   <label htmlFor="nom">Nom complet</label>
                   <input
@@ -251,7 +284,9 @@ export default function Login() {
             <div className="field">
               <label>Épreuve</label>
               <div className="exam-choice">
-                {Object.values(EXAMS).map((e) => (
+                {[...Object.values(EXAMS)]
+                  .sort((a, b) => (examEnabled[a.id] ? 0 : 1) - (examEnabled[b.id] ? 0 : 1))
+                  .map((e) => (
                   <button
                     type="button"
                     key={e.id}

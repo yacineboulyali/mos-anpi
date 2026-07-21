@@ -59,14 +59,15 @@ function mergeUnique(seed, added) {
 // par nom. Utilisée pour l'écran de connexion Admin, la liste déroulante
 // "Établissement" du stagiaire, et la grille de gestion des épreuves.
 export async function getEstablishmentAccessList() {
-  let added = [];
   if (supabase) {
     const { data, error } = await supabase
       .from("establishments")
       .select("etablissement, code");
-    if (!error) added = data;
+    if (!error) return mergeUnique(DEFAULT_ESTABLISHMENTS, data).sort((a, b) =>
+      a.etablissement.localeCompare(b.etablissement, "fr")
+    );
   }
-  if (added.length === 0 && !supabase) added = getLocalEstablishments();
+  const added = getLocalEstablishments();
 
   return mergeUnique(DEFAULT_ESTABLISHMENTS, added).sort((a, b) =>
     a.etablissement.localeCompare(b.etablissement, "fr")

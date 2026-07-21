@@ -53,6 +53,7 @@ export default function Exam() {
   const answered = Object.keys(answers).length;
   const given = answers[q.id];
   const isRevealed = !!revealed[q.id];
+  const canProceed = isRevealed || given !== undefined;
 
   function choose(i) {
     playSound("click");
@@ -157,6 +158,7 @@ export default function Exam() {
                 className={cls}
                 style={{ animationDelay: `${i * 45}ms` }}
                 onClick={() => choose(i)}
+                disabled={isRevealed}
               >
                 <span className="letter">{LETTERS[i]}</span>
                 <span>{o}</span>
@@ -195,11 +197,11 @@ export default function Exam() {
             <div className="bar-actions">
               <button className="bar-btn" disabled={idx === 0} onClick={() => goTo(idx - 1)}>← Précédent</button>
               {idx < TOTAL - 1 ? (
-                <button className="bar-btn" onClick={goNext}>
+                <button className="bar-btn" onClick={goNext} disabled={!canProceed}>
                   {given !== undefined && !isRevealed ? "Vérifier" : "Suivant →"}
                 </button>
               ) : (
-                <button className="bar-btn submit" onClick={goNext}>
+                <button className="bar-btn submit" onClick={goNext} disabled={!canProceed}>
                   {given !== undefined && !isRevealed ? "Vérifier" : "Soumettre"}
                 </button>
               )}

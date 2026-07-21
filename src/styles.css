@@ -128,6 +128,16 @@ button:focus:not(:focus-visible), input:focus:not(:focus-visible), a:focus:not(:
 .btn.grey { background: var(--grey); color: #fff; }
 .btn.grey:hover { background: var(--heading); }
 .btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 8px; }
+.btn-block { width: 100%; }
+
+.or-divider {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--grey); font-size: 12px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+}
+.or-divider::before, .or-divider::after {
+  content: ""; flex: 1; height: 1px; background: var(--line);
+}
 
 .card {
   background: var(--white); border: 1px solid var(--line);
@@ -290,8 +300,9 @@ button:focus:not(:focus-visible), input:focus:not(:focus-visible), a:focus:not(:
   transition: border-color .12s ease, background .12s ease, transform .1s ease;
   animation: fadeInUp .3s ease both;
 }
-.opt:hover { border-color: var(--accent, var(--teal)); background: var(--paper); transform: translateX(2px); }
-.opt:active { transform: scale(.98); }
+.opt:hover:not(:disabled) { border-color: var(--accent, var(--teal)); background: var(--paper); transform: translateX(2px); }
+.opt:active:not(:disabled) { transform: scale(.98); }
+.opt:disabled { cursor: not-allowed; }
 .opt.sel { border-color: #3B82F6; background: #EFF6FF; }
 .opt .letter {
   flex: none; width: 28px; height: 28px; border-radius: 8px;
@@ -438,6 +449,10 @@ tr:nth-child(even) td { background: #FAFCFB; }
 .import-result.has-errors { border-color: var(--red); background: #FBEBEB; }
 [data-theme="dark"] .import-result.has-errors { background: rgba(224, 114, 114, .12); }
 
+.add-form { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+.add-form .field { flex: 1 1 220px; margin: 0; }
+.add-form .btn { flex: 0 0 auto; }
+
 .exam-settings { display: grid; gap: 10px; padding: 6px 4px; }
 .exam-settings-row {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
@@ -493,6 +508,7 @@ tr:nth-child(even) td { background: #FAFCFB; }
   .admin-head > div { justify-content: center; }
   .filters { flex-direction: column; }
   .filters input, .filters select { width: 100%; }
+  .add-form { flex-direction: column; align-items: stretch; }
 
   /* iOS effectue un zoom automatique au focus sur les champs affichant
      moins de 16px : on relève la taille uniquement sur mobile pour l'éviter. */
