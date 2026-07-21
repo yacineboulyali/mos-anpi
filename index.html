@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>QCM MOS — Entraînement OFPPT EFP Témara</title>
+  <meta name="description"
+    content="Plateforme d'entraînement aux QCM de certification MOS (Excel, Word, PowerPoint, Excel Expert)" />
+  <meta name="theme-color" content="#00796B" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="QCM MOS" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <script>
+    (function () {
+      try {
+        var m = localStorage.getItem('mos_theme') || 'system';
+        var resolved = m === 'system'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : m;
+        document.documentElement.setAttribute('data-theme', resolved);
+      } catch (e) {}
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
