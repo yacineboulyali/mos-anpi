@@ -1,0 +1,27 @@
+[33mcommit 6b540ae74e67c1e31ae6ed37280d4cd5ea0549c1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: Yacine Boulyali <yacineboulyalis@gmail.com>
+Date:   Tue Jul 21 20:15:36 2026 +0100
+
+    Reuse active candidate session for new training, fix exam UX bugs
+    
+    - Login: skip CIN lookup and prefill identity when a candidate session
+      is already active, so relaunching a training needs no re-entry
+    - Exam: disable answer options and Suivant/Soumettre once a question
+      is revealed, so no accidental double-submit
+    - Admin: inline error instead of alert() when adding an establishment,
+      restyle the add-establishment form
+    - establishmentsAdmin: fix Supabase establishments being dropped when
+      local establishments also exist
+    
+    Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>
+
+[33mcommit ff661f9d0b138a48f7af5fff4ad2dd5e53f080fb[m
+Author: Yacine Boulyali <yacineboulyalis@gmail.com>
+Date:   Tue Jul 21 12:30:32 2026 +0100
+
+    Initial commit: QCM MOS training platform
+    
+    Excel/Word/PowerPoint/Excel Expert quiz app with sound effects
+    and a mute toggle next to the nav drawer.
+    
+    Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>

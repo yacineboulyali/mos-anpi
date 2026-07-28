@@ -54,7 +54,7 @@ export function buildBank(examId) {
   return { exam, DOMAINS, FLAT, TOTAL: FLAT.length };
 }
 
-function shuffleArray(arr) {
+export function shuffleArray(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -63,7 +63,7 @@ function shuffleArray(arr) {
   return a;
 }
 
-function shuffleQuestionOptions(q) {
+export function shuffleQuestionOptions(q) {
   const order = shuffleArray(q.opts.map((_, i) => i));
   return {
     ...q,

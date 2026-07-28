@@ -61,11 +61,11 @@ export default function Results() {
       </div>
       <div className="card score-hero">
         <div className="eyebrow">Résultat de l'entraînement — {attempt.examLabel || "MOS"}</div>
-        <h1 style={{ margin: "8px 0 4px", color: "var(--heading)" }}>
+        <h1 style={{ margin: "0.5rem 0 0.25rem", color: "var(--heading)" }}>
           {attempt.nom} — {attempt.groupe}
         </h1>
         {attempt.etablissement && (
-          <p style={{ margin: "0 0 16px", fontSize: 14, color: "var(--grey)" }}>{attempt.etablissement}</p>
+          <p style={{ margin: "0 0 1rem", fontSize: "0.875rem", color: "var(--grey)" }}>{attempt.etablissement}</p>
         )}
         <div
           className="score-ring"
@@ -122,8 +122,8 @@ export default function Results() {
       {showReview && (
         <>
           <h2 className="section-title">Correction détaillée</h2>
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 14, display: "inline-flex", gap: 8, alignItems: "center" }}>
+          <div style={{ marginBottom: "0.875rem" }}>
+            <label style={{ fontSize: "0.875rem", display: "inline-flex", gap: "0.5rem", alignItems: "center" }}>
               <input
                 type="checkbox"
                 checked={onlyErrors}
@@ -140,7 +140,7 @@ export default function Results() {
             const num = FLAT.indexOf(q) + 1;
             return (
               <div className="card review-q" key={q.id}>
-                <span className="domain-tag" style={{ marginBottom: 10 }}>{q.domain}</span>
+                <span className="domain-tag" style={{ marginBottom: "0.625rem" }}>{q.domain}</span>
                 <div className="q-text"><span className="q-num">Q{num}.</span> {q.q}</div>
                 <div className="opts">
                   {q.opts.map((o, i) => {
@@ -156,7 +156,7 @@ export default function Results() {
                   })}
                 </div>
                 {d.given === null && (
-                  <p style={{ marginTop: 10, fontSize: 13, color: "var(--grey)" }}>Question sans réponse.</p>
+                  <p style={{ marginTop: "0.625rem", fontSize: "0.8125rem", color: "var(--grey)" }}>Question sans réponse.</p>
                 )}
               </div>
             );

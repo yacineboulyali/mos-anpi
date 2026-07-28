@@ -19,13 +19,18 @@ export default function NavDrawer() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  // Masqué pendant l'examen officiel : aucune navigation ne doit être
+  // possible tant que l'épreuve est en cours (voir ExamLockGuard).
+  if (location.pathname === "/examen/epreuve") return null;
+
   function openDrawer() {
     setSession(getSession());
     setOpen(true);
   }
 
   function go(path) {
-    if (location.pathname === "/exam" && path !== "/exam") {
+    const inExam = location.pathname === "/exam" || location.pathname === "/examen/epreuve";
+    if (inExam && path !== location.pathname) {
       if (!window.confirm("Quitter l'épreuve en cours ? Votre progression sera perdue.")) return;
     }
     setOpen(false);
@@ -94,6 +99,9 @@ export default function NavDrawer() {
               )}
               {session.type === "student" && (
                 <button type="button" onClick={() => go("/mon-espace")}>🎓 Mon espace</button>
+              )}
+              {(session.type === "guest" || session.type === "candidate") && (
+                <button type="button" onClick={() => go("/examen")}>📝 Examen officiel</button>
               )}
               {session.type === "guest" && (
                 <>

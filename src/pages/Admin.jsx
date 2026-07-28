@@ -4,8 +4,10 @@ import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   PieChart, Pie, Cell, Legend, BarChart, Bar, LabelList,
 } from "recharts";
+import * as XLSX from "xlsx";
 import { getAttempts, clearAttempts, supabase } from "../lib/storage";
 import { EXAMS, PASS_PCT } from "../lib/exams";
+import { OFFICIAL_MAX_ATTEMPTS, OFFICIAL_MAX_NOTE, OFFICIAL_PASS_NOTE, OFFICIAL_PASS_PCT, scoreToNote } from "../lib/officialExam";
 import { getExamSettings, setExamEnabled as saveExamEnabled } from "../lib/examSettings";
 import { bulkUpsertStudents, getAllStudents, deleteStudents } from "../lib/students";
 import { downloadStudentTemplate, parseStudentsFile, normalizeStudentsRows } from "../lib/studentImport";
@@ -88,6 +90,7 @@ export default function Admin() {
   const [search, setSearch] = useState("");
   const [groupe, setGroupe] = useState("Tous");
   const [examFilter, setExamFilter] = useState("Tous");
+  const [modeFilter, setModeFilter] = useState("Tous");
   const [refresh, setRefresh] = useState(0);
   const [attempts, setAttempts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -339,9 +342,13 @@ export default function Admin() {
     ...roster.map((s) => s.etablissement).filter(Boolean),
   ])].sort((a, b) => (a === "Tous" ? -1 : b === "Tous" ? 1 : a.localeCompare(b, "fr")));
 
-  const groupes = ["Tous", ...new Set(scopedAttempts.map((a) => a.groupe))];
-  const exams = ["Tous", ...new Set(scopedAttempts.map((a) => a.examLabel || "Excel 2016"))];
-  const filtered = scopedAttempts.filter(
+  const modeScopedAttempts = modeFilter === "Tous"
+    ? scopedAttempts
+    : scopedAttempts.filter((a) => (a.kind || "training") === (modeFilter === "Examen officiel" ? "official" : "training"));
+
+  const groupes = ["Tous", ...new Set(modeScopedAttempts.map((a) => a.groupe))];
+  const exams = ["Tous", ...new Set(modeScopedAttempts.map((a) => a.examLabel || "Excel 2016"))];
+  const filtered = modeScopedAttempts.filter(
     (a) =>
       (groupe === "Tous" || a.groupe === groupe) &&
       (examFilter === "Tous" || (a.examLabel || "Excel 2016") === examFilter) &&
@@ -421,6 +428,10 @@ export default function Admin() {
 
   const groupChartData = groupStats.map((g) => ({ groupe: g.groupe, score: g.avg }));
 
+  const isOfficialMode = modeFilter === "Examen officiel";
+  const passThresholdLabel = isOfficialMode ? `>= ${OFFICIAL_PASS_NOTE}/${OFFICIAL_MAX_NOTE}` : `>= ${PASS_PCT} %`;
+  const bestLabel = isOfficialMode ? `${scoreToNote(best)} / ${OFFICIAL_MAX_NOTE}` : `${best}%`;
+
   function exportCsv() {
     const rows = [
       ["Date", "Épreuve", "CIN", "Nom", "Groupe", "Établissement", "Appareil", "Connexion", "Score (%)", "Bonnes réponses", "Total", "Verdict", "Durée (s)"],
@@ -441,6 +452,21 @@ export default function Admin() {
     URL.revokeObjectURL(a.href);
   }
 
+  // Bilan d'examen officiel au format Excel : une ligne par stagiaire, avec
+  // la note retenue (la meilleure des tentatives, sur OFFICIAL_MAX_NOTE).
+  // Reprend les memes filtres (groupe / epreuve / recherche) que le tableau
+  // "Statistiques par stagiaire" affiche au-dessus.
+  function exportExcelBilan() {
+    const headers = ["CIN", "Nom complet", "Classe", "Note (/40)"];
+    const rows = students.map((s) => [s.cin || "", s.nom, s.groupe || "", scoreToNote(s.best)]);
+    const sheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    sheet["!cols"] = [{ wch: 14 }, { wch: 28 }, { wch: 16 }, { wch: 12 }];
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, sheet, "Bilan examen");
+    const suffix = examFilter !== "Tous" ? `_${examFilter.replace(/\s+/g, "_")}` : "";
+    XLSX.writeFile(workbook, `bilan_examen_officiel${suffix}.xlsx`);
+  }
+
   return (
     <div className="admin-wrap">
       <div className="admin-head">
@@ -448,12 +474,12 @@ export default function Admin() {
           <Brand compact />
           <div>
             <h1>📊 {isSuperAdmin ? "Super Administration" : "Tableau de bord Administration"}</h1>
-            <p style={{ fontSize: 13, color: "var(--grey)", marginTop: 2 }}>
+            <p style={{ fontSize: "0.8125rem", color: "var(--grey)", marginTop: "0.125rem" }}>
               {isSuperAdmin ? "Tous les établissements" : access.etablissement}
             </p>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "0.625rem", flexWrap: "wrap" }}>
           <button className="btn ghost" onClick={exportCsv} disabled={!n}>Exporter CSV</button>
           <button
             className="btn danger"
@@ -473,7 +499,7 @@ export default function Admin() {
         </div>
       </div>
 
-      <div style={{ textAlign: "right", marginBottom: 18, marginTop: -8 }}>
+      <div style={{ textAlign: "right", marginBottom: "1.125rem", marginTop: "-0.5rem" }}>
         <button type="button" className="about-trigger" onClick={() => setShowAbout(true)}>
           ℹ️ À propos du créateur
         </button>
@@ -482,8 +508,8 @@ export default function Admin() {
       {isSuperAdmin ? (
         <>
           <h2 className="section-title" style={{ marginTop: 0 }}>Gestion des établissements</h2>
-          <div className="card" style={{ display: "flex", flexDirection: "column", gap: 16, padding: "20px 22px" }}>
-            <p style={{ margin: 0, fontSize: 13.5, color: "var(--grey)" }}>
+          <div className="card" style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "1.25rem 1.375rem" }}>
+            <p style={{ margin: 0, fontSize: "0.84375rem", color: "var(--grey)" }}>
               Ajoutez un établissement avec son propre code d'accès formateur/directeur. Il apparaîtra aussitôt dans la liste déroulante de la page de connexion et dans la grille des épreuves ci-dessous.
             </p>
             <div className="add-form">
@@ -517,7 +543,7 @@ export default function Admin() {
               </button>
             </div>
             {addEstError && (
-              <p style={{ margin: 0, fontSize: 13, color: "var(--red)" }}>{addEstError}</p>
+              <p style={{ margin: 0, fontSize: "0.8125rem", color: "var(--red)" }}>{addEstError}</p>
             )}
             {establishmentsLoading ? (
               <div className="empty">Chargement…</div>
@@ -553,7 +579,7 @@ export default function Admin() {
                     {Object.values(EXAMS).map((e) => (
                       <th key={e.id} style={{ textAlign: "center" }}>
                         {e.short}
-                        <div style={{ display: "flex", gap: 4, justifyContent: "center", marginTop: 4 }}>
+                        <div style={{ display: "flex", gap: "0.25rem", justifyContent: "center", marginTop: "0.25rem" }}>
                           <button type="button" className="btn ghost btn-sm" style={{ color: "#fff" }} onClick={() => bulkSetExam(e.id, true)}>Tout activer</button>
                           <button type="button" className="btn ghost btn-sm" style={{ color: "#fff" }} onClick={() => bulkSetExam(e.id, false)}>Tout masquer</button>
                         </div>
@@ -618,12 +644,12 @@ export default function Admin() {
       )}
 
       <h2 className="section-title">Importer des stagiaires</h2>
-      <div className="card" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <p style={{ margin: 0, fontSize: 13.5, color: "var(--grey)" }}>
+      <div className="card" style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <p style={{ margin: 0, fontSize: "0.84375rem", color: "var(--grey)" }}>
           Téléchargez le gabarit, remplissez une ligne par stagiaire (CIN, Nom, Groupe{isSuperAdmin ? ", Établissement" : ""}), puis importez le fichier pour créer ou mettre à jour les fiches en une fois.
         </p>
         {isSuperAdmin && (
-          <div className="field" style={{ maxWidth: 420 }}>
+          <div className="field" style={{ maxWidth: "26.25rem" }}>
             <label htmlFor="import-target">Établissement cible</label>
             <select id="import-target" value={importTarget} onChange={(e) => setImportTarget(e.target.value)}>
               <option value="">Utiliser la colonne « Établissement » du fichier</option>
@@ -633,7 +659,7 @@ export default function Admin() {
             </select>
           </div>
         )}
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "0.625rem", flexWrap: "wrap" }}>
           <button
             type="button"
             className="btn ghost"
@@ -658,12 +684,12 @@ export default function Admin() {
               {importResult.imported} stagiaire{importResult.imported > 1 ? "s" : ""} importé{importResult.imported > 1 ? "s" : ""} sur {importResult.total} ligne{importResult.total > 1 ? "s" : ""}.
             </p>
             {importResult.skippedNoCin > 0 && (
-              <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--grey)" }}>
+              <p style={{ margin: "0.25rem 0 0", fontSize: "0.8125rem", color: "var(--grey)" }}>
                 {importResult.skippedNoCin} ligne{importResult.skippedNoCin > 1 ? "s" : ""} ignorée{importResult.skippedNoCin > 1 ? "s" : ""} (CIN manquant).
               </p>
             )}
             {importResult.errors.length > 0 && (
-              <ul style={{ margin: "6px 0 0", paddingLeft: 18, fontSize: 13, color: "var(--red)" }}>
+              <ul style={{ margin: "0.375rem 0 0", paddingLeft: "1.125rem", fontSize: "0.8125rem", color: "var(--red)" }}>
                 {importResult.errors.slice(0, 10).map((err, i) => <li key={i}>{err}</li>)}
                 {importResult.errors.length > 10 && <li>… et {importResult.errors.length - 10} autre(s).</li>}
               </ul>
@@ -708,7 +734,7 @@ export default function Admin() {
           <table>
             <thead>
               <tr>
-                <th style={{ width: 32 }}>
+                <th style={{ width: "2rem" }}>
                   <input
                     type="checkbox"
                     checked={rosterPage.rows.length > 0 && rosterPage.rows.every((s) => selectedCins.has(s.cin))}
@@ -758,8 +784,8 @@ export default function Admin() {
       <div className="kpis">
         <div className="card stat"><div className="k">Tentatives</div><div className="v">{n}</div></div>
         <div className="card stat"><div className="k">Score moyen</div><div className="v">{avg}%</div></div>
-        <div className="card stat"><div className="k">Taux de réussite (≥ {PASS_PCT} %)</div><div className="v">{passRate}%</div></div>
-        <div className="card stat"><div className="k">Meilleur score</div><div className="v">{best}%</div></div>
+        <div className="card stat"><div className="k">Taux de réussite ({passThresholdLabel})</div><div className="v">{passRate}%</div></div>
+        <div className="card stat"><div className="k">Meilleur score</div><div className="v">{bestLabel}</div></div>
         <div className="card stat"><div className="k">Durée moyenne</div><div className="v">{Math.floor(avgDurationSec / 60)} min {avgDurationSec % 60} s</div></div>
       </div>
 
@@ -811,7 +837,7 @@ export default function Admin() {
                 <Legend
                   verticalAlign="bottom"
                   height={28}
-                  formatter={(value) => <span style={{ color: "var(--grey)", fontSize: 12.5 }}>{value}</span>}
+                  formatter={(value) => <span style={{ color: "var(--grey)", fontSize: "0.78125rem" }}>{value}</span>}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -831,7 +857,7 @@ export default function Admin() {
                   formatter={(value) => [`${value}%`, "Score moyen"]}
                 />
                 <Bar dataKey="score" name="Score moyen" fill="var(--teal)" radius={[4, 4, 0, 0]} maxBarSize={48}>
-                  <LabelList dataKey="score" position="top" formatter={(v) => `${v}%`} style={{ fill: "var(--heading)", fontSize: 11, fontWeight: 700 }} />
+                  <LabelList dataKey="score" position="top" formatter={(v) => `${v}%`} style={{ fill: "var(--heading)", fontSize: "0.6875rem", fontWeight: 700 }} />
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -855,6 +881,11 @@ export default function Admin() {
         </select>
         <select value={examFilter} onChange={(e) => setExamFilter(e.target.value)}>
           {exams.map((e) => <option key={e}>{e}</option>)}
+        </select>
+        <select value={modeFilter} onChange={(e) => setModeFilter(e.target.value)}>
+          <option>Tous</option>
+          <option>Entraînement</option>
+          <option>Examen officiel</option>
         </select>
       </div>
 
@@ -899,7 +930,9 @@ export default function Admin() {
                   <td>{a.etablissement || "—"}</td>
                   <td>{a.device || "—"}</td>
                   <td>{a.connectionType || "—"}</td>
-                  <td style={{ fontWeight: 700, color: "var(--heading)" }}>{a.score}%</td>
+                  <td style={{ fontWeight: 700, color: "var(--heading)" }}>
+                    {a.kind === "official" ? `${scoreToNote(a.score)} / ${OFFICIAL_MAX_NOTE}` : `${a.score}%`}
+                  </td>
                   <td><span className={`badge ${a.passed ? "pass" : "fail"}`}>{a.passed ? "Réussi" : "Échec"}</span></td>
                   <td>{Math.floor(a.durationSec / 60)} min</td>
                 </tr>
@@ -911,7 +944,14 @@ export default function Admin() {
         )}
       </div>
 
-      <h2 className="section-title">Statistiques par stagiaire</h2>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.625rem", margin: "1.875rem 0 0.875rem" }}>
+        <h2 className="section-title" style={{ margin: 0 }}>Statistiques par stagiaire</h2>
+        {isOfficialMode && (
+          <button type="button" className="btn ghost" disabled={students.length === 0} onClick={exportExcelBilan}>
+            📊 Télécharger le bilan Excel
+          </button>
+        )}
+      </div>
       <div className="card table-card">
         {students.length === 0 ? (
           <div className="empty">Aucun stagiaire pour l'instant.</div>
@@ -927,6 +967,13 @@ export default function Admin() {
                 <SortableTh label="Score moyen" sortKey="avg" state={studentsTable} />
                 <SortableTh label="Meilleur score" sortKey="best" state={studentsTable} />
                 <SortableTh label="Dernière activité" sortKey="last" state={studentsTable} />
+                {isOfficialMode && (
+                  <>
+                    <th>Tentatives</th>
+                    <th>Note</th>
+                    <th>Statut</th>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -945,6 +992,13 @@ export default function Admin() {
                   <td style={{ fontWeight: 700, color: "var(--heading)" }}>{s.avg}%</td>
                   <td>{s.best}%</td>
                   <td>{new Date(s.last).toLocaleString("fr-FR")}</td>
+                  {isOfficialMode && (
+                    <>
+                      <td>{s.attempts}/{OFFICIAL_MAX_ATTEMPTS}</td>
+                      <td style={{ fontWeight: 700, color: "var(--heading)" }}>{scoreToNote(s.best)} / {OFFICIAL_MAX_NOTE}</td>
+                      <td><span className={`badge ${s.best >= OFFICIAL_PASS_PCT ? "pass" : "fail"}`}>{s.best >= OFFICIAL_PASS_PCT ? "Réussi" : "Échec"}</span></td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -987,7 +1041,7 @@ export default function Admin() {
         )}
       </div>
 
-      <p style={{ marginTop: 16, fontSize: 13, color: "var(--grey)" }}>
+      <p style={{ marginTop: "1rem", fontSize: "0.8125rem", color: "var(--grey)" }}>
         {supabase
           ? "ℹ️ Les tentatives de tous les postes sont centralisées dans la base Supabase et visibles ici en temps réel."
           : "ℹ️ Supabase n'est pas configuré (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY) : chaque poste conserve ses propres résultats en localStorage. Utilisez « Exporter CSV » sur chaque poste pour consolider."}

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { EXAMS } from "../lib/exams";
+import { OFFICIAL_MAX_NOTE, scoreToNote } from "../lib/officialExam";
 
 export default function StudentProfileModal({ student, attempts, onClose }) {
   useEffect(() => {
@@ -28,7 +29,7 @@ export default function StudentProfileModal({ student, attempts, onClose }) {
           </p>
         </div>
 
-        <div className="kpis" style={{ marginBottom: 20 }}>
+        <div className="kpis" style={{ marginBottom: "1.25rem" }}>
           <div className="card stat"><div className="k">Tentatives</div><div className="v">{n}</div></div>
           <div className="card stat"><div className="k">Score moyen</div><div className="v">{avg}%</div></div>
           <div className="card stat"><div className="k">Meilleur score</div><div className="v">{best}%</div></div>
@@ -53,7 +54,9 @@ export default function StudentProfileModal({ student, attempts, onClose }) {
                   <tr key={i}>
                     <td>{new Date(a.ts).toLocaleString("fr-FR")}</td>
                     <td>{a.examLabel || EXAMS[a.examId]?.short || "—"}</td>
-                    <td style={{ fontWeight: 700, color: "var(--heading)" }}>{a.score}%</td>
+                    <td style={{ fontWeight: 700, color: "var(--heading)" }}>
+                      {a.kind === "official" ? `${scoreToNote(a.score)} / ${OFFICIAL_MAX_NOTE}` : `${a.score}%`}
+                    </td>
                     <td><span className={`badge ${a.passed ? "pass" : "fail"}`}>{a.passed ? "Réussi" : "Échec"}</span></td>
                     <td>{Math.floor(a.durationSec / 60)} min {a.durationSec % 60} s</td>
                   </tr>

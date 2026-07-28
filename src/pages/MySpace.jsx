@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getStudentByCin } from "../lib/students";
 import { getAttemptsByCin } from "../lib/storage";
 import { EXAMS, PASS_PCT } from "../lib/exams";
+import { OFFICIAL_MAX_NOTE, scoreToNote } from "../lib/officialExam";
 import Brand from "../components/Brand";
 
 function getStoredAccess() {
@@ -76,7 +77,7 @@ export default function MySpace() {
                   autoFocus
                 />
                 {error && (
-                  <p style={{ marginTop: 6, fontSize: 12.5, color: "var(--red)" }}>{error}</p>
+                  <p style={{ marginTop: "0.375rem", fontSize: "0.78125rem", color: "var(--red)" }}>{error}</p>
                 )}
               </div>
               <button className="btn" disabled={!cin.trim() || checking} onClick={login}>
@@ -103,12 +104,12 @@ export default function MySpace() {
           <Brand compact />
           <div>
             <h1>🎓 Mon espace</h1>
-            <p style={{ fontSize: 13, color: "var(--grey)", marginTop: 2 }}>
+            <p style={{ fontSize: "0.8125rem", color: "var(--grey)", marginTop: "0.125rem" }}>
               {student.nom} {student.groupe ? `— ${student.groupe}` : ""}
             </p>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: "0.625rem", flexWrap: "wrap" }}>
           <button className="btn danger" onClick={logout}>Changer de CIN</button>
           <Link className="btn" to="/">Accueil</Link>
         </div>
@@ -145,7 +146,9 @@ export default function MySpace() {
                 <tr key={i} style={{ animationDelay: `${Math.min(i, 12) * 35}ms` }}>
                   <td>{new Date(a.ts).toLocaleString("fr-FR")}</td>
                   <td>{a.examLabel || EXAMS[a.examId]?.short || "—"}</td>
-                  <td style={{ fontWeight: 700, color: "var(--heading)" }}>{a.score}%</td>
+                  <td style={{ fontWeight: 700, color: "var(--heading)" }}>
+                    {a.kind === "official" ? `${scoreToNote(a.score)} / ${OFFICIAL_MAX_NOTE}` : `${a.score}%`}
+                  </td>
                   <td><span className={`badge ${a.passed ? "pass" : "fail"}`}>{a.passed ? "Réussi" : "Échec"}</span></td>
                   <td>{Math.floor(a.durationSec / 60)} min {a.durationSec % 60} s</td>
                 </tr>
@@ -154,7 +157,7 @@ export default function MySpace() {
           </table>
         )}
       </div>
-      <p style={{ marginTop: 16, fontSize: 13, color: "var(--grey)" }}>
+      <p style={{ marginTop: "1rem", fontSize: "0.8125rem", color: "var(--grey)" }}>
         ℹ️ Seuil de réussite : {PASS_PCT} %.
       </p>
     </div>

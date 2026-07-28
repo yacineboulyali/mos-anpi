@@ -25,7 +25,6 @@ export default function Login() {
   const [etablissementOptions, setEtablissementOptions] = useState(ESTABLISHMENTS_WITH_OTHER);
   const [cin, setCin] = useState("");
   const [cinStatus, setCinStatus] = useState("idle"); // idle | checking | found | new
-  const [visitorMode, setVisitorMode] = useState(false);
   const [nom, setNom] = useState("");
   const [groupe, setGroupe] = useState("");
   const [reuseSession, setReuseSession] = useState(false);
@@ -39,8 +38,6 @@ export default function Login() {
   const availableIds = Object.keys(EXAMS).filter((id) => examEnabled[id]);
   const noExamAvailable = availableIds.length === 0;
   const cinResolved = cinStatus === "found" || cinStatus === "switched" || cinStatus === "new";
-  const isCinFlow = cinResolved && !visitorMode;
-  const showDetails = visitorMode || cinResolved;
 
   useEffect(() => {
     let active = true;
@@ -54,17 +51,13 @@ export default function Login() {
   // sans ressaisir son CIN ni ses informations : on réutilise sa session.
   useEffect(() => {
     const existing = getSession();
-    if (existing.type !== "candidate" || !existing.nom) return;
+    if (existing.type !== "candidate" || !existing.nom || !existing.cin) return;
     setEtablissement(existing.etablissement || ESTABLISHMENTS_WITH_OTHER[0]);
     setNom(existing.nom || "");
     setGroupe(existing.groupe || "");
     if (existing.examId) setExamId(existing.examId);
-    if (existing.cin) {
-      setCin(existing.cin);
-      setCinStatus("found");
-    } else {
-      setVisitorMode(true);
-    }
+    setCin(existing.cin);
+    setCinStatus("found");
     setReuseSession(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -94,17 +87,7 @@ export default function Login() {
 
   function changeCin(value) {
     setCin(value);
-    if (visitorMode) setVisitorMode(false);
     if (cinStatus !== "idle" && cinStatus !== "checking") setCinStatus("idle");
-  }
-
-  function continueAsVisitor() {
-    clearLookupTimer();
-    setCin("");
-    setCinStatus("idle");
-    setVisitorMode(true);
-    setNom("");
-    setGroupe("");
   }
 
   function switchIdentity() {
@@ -112,7 +95,6 @@ export default function Login() {
     setReuseSession(false);
     setCin("");
     setCinStatus("idle");
-    setVisitorMode(false);
     setNom("");
     setGroupe("");
   }
@@ -151,17 +133,17 @@ export default function Login() {
     }
   }
 
-  const canStart = showDetails && nom.trim();
+  const canStart = cinResolved && nom.trim();
 
   const start = () => {
     if (!canStart || noExamAvailable) return;
     const identity = {
-      cin: isCinFlow ? cin.trim().toUpperCase() : null,
+      cin: cin.trim().toUpperCase(),
       nom: nom.trim(),
       groupe: groupe.trim(),
       etablissement,
     };
-    if (isCinFlow) upsertStudent(identity).catch(() => {});
+    upsertStudent(identity).catch(() => {});
     sessionStorage.setItem(
       "mos_candidate",
       JSON.stringify({
@@ -191,7 +173,7 @@ export default function Login() {
           <div className="login-body">
             {reuseSession && (
               <div className="field">
-                <p style={{ marginTop: 0, fontSize: 12.5, color: "var(--grey)" }}>
+                <p style={{ marginTop: 0, fontSize: "0.78125rem", color: "var(--grey)" }}>
                   ✔ Session active — connecté en tant que <strong>{nom}</strong> —{" "}
                   <button type="button" className="about-trigger" onClick={switchIdentity}>
                     ce n'est pas moi
@@ -200,51 +182,34 @@ export default function Login() {
               </div>
             )}
 
-            {!reuseSession && !visitorMode && (
-              <>
-                <div className="field">
-                  <label htmlFor="cin">CIN (carte d'identité nationale)</label>
-                  <input
-                    id="cin"
-                    value={cin}
-                    onChange={(e) => changeCin(e.target.value)}
-                    onKeyUp={(e) => e.key !== "Enter" && scheduleLookup(e.target.value)}
-                    onBlur={() => lookupCin()}
-                    onKeyDown={(e) => e.key === "Enter" && lookupCin()}
-                    placeholder="Ex. : AB123456"
-                    autoFocus
-                  />
-                  {cinStatus !== "idle" && (
-                    <p
-                      style={{
-                        marginTop: 6,
-                        fontSize: 12.5,
-                        color: cinStatus === "found" || cinStatus === "switched" ? "var(--good)" : "var(--grey)",
-                      }}
-                    >
-                      {CIN_STATUS_TEXT[cinStatus]}
-                    </p>
-                  )}
-                </div>
-                <div className="or-divider">ou</div>
-                <button type="button" className="btn grey btn-block" onClick={continueAsVisitor}>
-                  <span aria-hidden="true">👤</span> Continuer comme visiteur
-                </button>
-              </>
-            )}
-
-            {!reuseSession && visitorMode && (
+            {!reuseSession && (
               <div className="field">
-                <p style={{ marginTop: 0, fontSize: 12.5, color: "var(--grey)" }}>
-                  Mode visiteur —{" "}
-                  <button type="button" className="about-trigger" onClick={() => setVisitorMode(false)}>
-                    saisir un CIN
-                  </button>
-                </p>
+                <label htmlFor="cin">CIN (carte d'identité nationale)</label>
+                <input
+                  id="cin"
+                  value={cin}
+                  onChange={(e) => changeCin(e.target.value)}
+                  onKeyUp={(e) => e.key !== "Enter" && scheduleLookup(e.target.value)}
+                  onBlur={() => lookupCin()}
+                  onKeyDown={(e) => e.key === "Enter" && lookupCin()}
+                  placeholder="Ex. : AB123456"
+                  autoFocus
+                />
+                {cinStatus !== "idle" && (
+                  <p
+                    style={{
+                      marginTop: "0.375rem",
+                      fontSize: "0.78125rem",
+                      color: cinStatus === "found" || cinStatus === "switched" ? "var(--good)" : "var(--grey)",
+                    }}
+                  >
+                    {CIN_STATUS_TEXT[cinStatus]}
+                  </p>
+                )}
               </div>
             )}
 
-            {showDetails && (
+            {cinResolved && (
               <>
                 <div className="field">
                   <label htmlFor="etablissement">Établissement</label>
@@ -266,7 +231,6 @@ export default function Login() {
                     onChange={(e) => setNom(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && start()}
                     placeholder="Ex. : Karim Alami"
-                    autoFocus={visitorMode}
                   />
                 </div>
                 <div className="field">
@@ -301,7 +265,7 @@ export default function Login() {
                 ))}
               </div>
               {noExamAvailable && (
-                <p style={{ marginTop: 8, fontSize: 13, color: "var(--red)" }}>
+                <p style={{ marginTop: "0.5rem", fontSize: "0.8125rem", color: "var(--red)" }}>
                   Aucune épreuve n'est disponible pour le moment. Contactez votre formateur.
                 </p>
               )}
@@ -315,6 +279,8 @@ export default function Login() {
               Commencer l'entraînement
             </button>
             <div className="admin-link">
+              <Link to="/examen">Examen officiel</Link>
+              {" · "}
               <Link to="/mon-espace">Mon espace (stagiaire)</Link>
               {" · "}
               <Link to="/admin">Espace Administration</Link>

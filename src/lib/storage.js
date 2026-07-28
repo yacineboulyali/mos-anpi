@@ -34,6 +34,7 @@ function toRow(attempt) {
     duration_sec: attempt.durationSec,
     per_domain: attempt.perDomain,
     answers: attempt.answers,
+    kind: attempt.kind || "training",
   };
 }
 
@@ -55,6 +56,7 @@ function fromRow(row) {
     durationSec: row.duration_sec,
     perDomain: row.per_domain,
     answers: row.answers,
+    kind: row.kind || "training",
   };
 }
 
@@ -108,6 +110,18 @@ export async function getAttemptsByCin(cin) {
     if (!error) return data.map(fromRow);
   }
   return getLocalAttempts().filter((a) => (a.cin || "").trim().toUpperCase() === key);
+}
+
+// Historique et bilan des tentatives d'examen officiel d'un stagiaire pour
+// une épreuve donnée (utilisé pour afficher "Tentative X/5" et bloquer la
+// connexion une fois le quota atteint).
+export async function getOfficialAttemptStats(cin, examId) {
+  const attempts = (await getAttemptsByCin(cin))
+    .filter((a) => a.examId === examId && a.kind === "official")
+    .sort((a, b) => b.ts - a.ts);
+  const bestScore = attempts.length ? Math.max(...attempts.map((a) => a.score)) : 0;
+  const bestPassed = attempts.some((a) => a.passed);
+  return { count: attempts.length, bestScore, bestPassed, attempts };
 }
 
 export async function clearAttempts(etablissement) {
