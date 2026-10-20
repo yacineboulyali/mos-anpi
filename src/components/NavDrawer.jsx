@@ -21,7 +21,7 @@ export default function NavDrawer() {
 
   // Masqué pendant l'examen officiel : aucune navigation ne doit être
   // possible tant que l'épreuve est en cours (voir ExamLockGuard).
-  if (location.pathname === "/examen/epreuve") return null;
+  if (["/", "/anpi", "/examen/epreuve"].includes(location.pathname)) return null;
 
   function openDrawer() {
     setSession(getSession());
@@ -42,7 +42,7 @@ export default function NavDrawer() {
     else if (session.type === "candidate") logoutCandidate();
     else if (session.type === "student") logoutStudent();
     setOpen(false);
-    navigate("/");
+    navigate("/ofppt");
   }
 
   return (
@@ -90,7 +90,8 @@ export default function NavDrawer() {
             </div>
 
             <nav className="drawer-nav">
-              <button type="button" onClick={() => go("/")}>🏠 Accueil</button>
+              <button type="button" onClick={() => go("/ofppt")}>🏠 Accueil OFPPT</button>
+              <button type="button" onClick={() => go("/")}>↔ Choisir un espace</button>
               {session.type === "candidate" && hasResults() && (
                 <button type="button" onClick={() => go("/results")}>📊 Résultats</button>
               )}

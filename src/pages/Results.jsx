@@ -39,7 +39,7 @@ export default function Results() {
         <div className="card score-hero">
           <p>Aucun résultat à afficher.</p>
           <div className="actions-row">
-            <Link className="btn" to="/">Retour à l'accueil</Link>
+            <Link className="btn" to="/ofppt">Retour à l'accueil</Link>
           </div>
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function Results() {
         <button className="btn gold" onClick={() => setShowReview((s) => !s)}>
           {showReview ? "Masquer la correction" : "Voir la correction"}
         </button>
-        <Link className="btn ghost" to="/">Nouvel entraînement</Link>
+        <Link className="btn ghost" to="/ofppt">Nouvel entraînement</Link>
       </div>
 
       {showReview && (

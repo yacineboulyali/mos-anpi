@@ -6,6 +6,8 @@ import NavDrawer from "./components/NavDrawer.jsx";
 import SoundToggle from "./components/SoundToggle.jsx";
 import ExamLockGuard from "./components/ExamLockGuard.jsx";
 import Login from "./pages/Login.jsx";
+import Portal from "./pages/Portal.jsx";
+import AnpiHome from "./pages/AnpiHome.jsx";
 
 // Chargées à la demande : Admin embarque recharts / xlsx / react-qr-code (les
 // plus gros modules du projet), inutiles pour un stagiaire qui passe juste une
@@ -59,7 +61,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <ExamLockGuard />
       <Suspense fallback={<RouteLoading />}>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Portal />} />
+          <Route path="/ofppt" element={<Login />} />
+          <Route path="/anpi" element={<AnpiHome />} />
           <Route path="/exam" element={<Exam />} />
           <Route path="/results" element={<Results />} />
           <Route path="/admin" element={<Admin />} />

@@ -40,6 +40,10 @@ export default function Login() {
   const cinResolved = cinStatus === "found" || cinStatus === "switched" || cinStatus === "new";
 
   useEffect(() => {
+    document.title = "QCM MOS — Entraînement OFPPT";
+  }, []);
+
+  useEffect(() => {
     let active = true;
     getEstablishmentNames().then((names) => {
       if (active) setEtablissementOptions([...names, OTHER_OPTION]);

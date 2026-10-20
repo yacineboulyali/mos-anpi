@@ -309,7 +309,7 @@ export default function Admin() {
               Accéder au tableau de bord
             </button>
             <div className="admin-link">
-              <Link to="/">← Retour à l'accueil</Link>
+              <Link to="/ofppt">← Retour à l'accueil</Link>
               {" · "}
               <button type="button" className="about-trigger" onClick={() => setShowAbout(true)}>
                 À propos
@@ -495,7 +495,7 @@ export default function Admin() {
           >
             Tout effacer
           </button>
-          <Link className="btn" to="/">Accueil</Link>
+          <Link className="btn" to="/ofppt">Accueil</Link>
         </div>
       </div>
 

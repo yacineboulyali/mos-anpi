@@ -84,7 +84,7 @@ export default function MySpace() {
                 {checking ? "Recherche…" : "Voir mes résultats"}
               </button>
               <div className="admin-link">
-                <Link to="/">← Retour à l'accueil</Link>
+                <Link to="/ofppt">← Retour à l'accueil</Link>
               </div>
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function MySpace() {
         </div>
         <div style={{ display: "flex", gap: "0.625rem", flexWrap: "wrap" }}>
           <button className="btn danger" onClick={logout}>Changer de CIN</button>
-          <Link className="btn" to="/">Accueil</Link>
+          <Link className="btn" to="/ofppt">Accueil</Link>
         </div>
       </div>
 

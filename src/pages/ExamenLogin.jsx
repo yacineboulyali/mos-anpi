@@ -358,7 +358,7 @@ export default function ExamenLogin() {
               {progress ? "Reprendre l'examen en cours" : "Commencer l'examen"}
             </button>
             <div className="admin-link">
-              <Link to="/">← Retour à l'accueil</Link>
+              <Link to="/ofppt">← Retour à l'accueil</Link>
             </div>
           </div>
         </div>

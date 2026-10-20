@@ -80,7 +80,7 @@ export default function ExamenResultat() {
         {remaining > 0 && (
           <Link className="btn" to="/examen">Repasser l'examen</Link>
         )}
-        <Link className="btn ghost" to="/">Retour à l'accueil</Link>
+        <Link className="btn ghost" to="/ofppt">Retour à l'accueil</Link>
       </div>
     </div>
   );

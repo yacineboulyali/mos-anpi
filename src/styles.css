@@ -267,6 +267,294 @@ button:focus:not(:focus-visible), input:focus:not(:focus-visible), a:focus:not(:
 }
 .privacy-notice strong { color: var(--heading); }
 
+/* ---------- dual training portal ---------- */
+.portal {
+  --portal-navy: #252b49;
+  --portal-gold: #dda232;
+  --portal-ivory: #fbf8ef;
+  position: relative;
+  isolation: isolate;
+  min-height: 100%;
+  overflow: hidden;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 2.5rem;
+  padding: 5rem 1.5rem 3rem;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(221, 162, 50, .14), transparent 24rem),
+    radial-gradient(circle at 12% 82%, rgba(0, 121, 107, .12), transparent 22rem),
+    var(--portal-ivory);
+  color: var(--portal-navy);
+  text-align: center;
+}
+
+.portal-intro { max-width: 54rem; position: relative; z-index: 1; }
+.portal-kicker {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #9b6c15;
+  font-weight: 800;
+  font-size: .82rem;
+  letter-spacing: .08em;
+}
+.portal-intro h1 {
+  font-size: clamp(2.1rem, 5vw, 4.25rem);
+  line-height: 1.1;
+  color: var(--portal-navy);
+  text-wrap: balance;
+}
+.portal-intro p {
+  max-width: 43rem;
+  margin: 1.25rem auto 0;
+  color: #62667a;
+  font-size: 1.05rem;
+  line-height: 1.9;
+}
+.portal-choices {
+  width: min(100%, 62rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+.portal-choice {
+  min-height: 15rem;
+  display: grid;
+  grid-template-columns: 8.5rem 1fr auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 2rem;
+  border: .0625rem solid rgba(37, 43, 73, .12);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, .88);
+  color: var(--portal-navy);
+  text-align: right;
+  text-decoration: none;
+  box-shadow: 0 1.25rem 4rem rgba(37, 43, 73, .09);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.portal-choice:hover {
+  transform: translateY(-.35rem);
+  border-color: var(--choice-accent);
+  box-shadow: 0 1.5rem 4rem rgba(37, 43, 73, .16);
+}
+.portal-choice-ofppt { --choice-accent: #00796b; }
+.portal-choice-anpi { --choice-accent: var(--portal-gold); }
+.portal-choice-ring {
+  width: 8.5rem;
+  height: 8.5rem;
+  display: grid;
+  place-items: center;
+  border: .2rem solid var(--choice-accent);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 .65rem rgba(0, 121, 107, .1);
+  overflow: hidden;
+}
+.portal-choice-ring img { width: 72%; height: 72%; object-fit: contain; }
+.portal-choice-anpi .portal-choice-ring { box-shadow: 0 0 0 .65rem rgba(221, 162, 50, .12); }
+.portal-choice-anpi .portal-choice-ring img { width: 100%; height: 100%; }
+.portal-choice-copy { display: grid; gap: .35rem; }
+.portal-choice-label { color: var(--choice-accent); font-size: .78rem; font-weight: 800; }
+.portal-choice-copy strong { font-family: 'Archivo', 'Inter', sans-serif; font-size: 1.55rem; }
+.portal-choice-copy > span:last-child { color: #747789; font-size: .9rem; }
+.portal-choice-arrow {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--choice-accent);
+  color: #fff;
+  font-size: 1.25rem;
+  transition: transform .2s ease;
+}
+.portal-choice:hover .portal-choice-arrow { transform: translateX(-.25rem); }
+.portal-footnote { position: relative; z-index: 1; color: #777b8e; font-size: .82rem; }
+.portal-orbit {
+  position: absolute;
+  border: .0625rem solid rgba(221, 162, 50, .18);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.portal-orbit-one { width: 30rem; height: 30rem; top: -16rem; right: -8rem; }
+.portal-orbit-two { width: 22rem; height: 22rem; bottom: -12rem; left: -6rem; border-color: rgba(0, 121, 107, .16); }
+
+/* ---------- ANPI professional exam space ---------- */
+.anpi-page {
+  --anpi-navy: #292e4b;
+  --anpi-gold: #dda232;
+  --anpi-gold-dark: #a66d08;
+  --anpi-ivory: #fbf8ef;
+  --anpi-muted: #686c7c;
+  min-height: 100%;
+  background: var(--anpi-ivory);
+  color: var(--anpi-navy);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.anpi-nav {
+  min-height: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+}
+.anpi-brand { display: flex; align-items: center; gap: .8rem; color: inherit; text-decoration: none; }
+.anpi-brand img { width: 3.6rem; height: 3.6rem; border-radius: 50%; object-fit: cover; }
+.anpi-brand span { display: grid; line-height: 1.35; }
+.anpi-brand strong { font-family: 'Archivo', sans-serif; font-size: 1.15rem; letter-spacing: .08em; }
+.anpi-brand small { color: var(--anpi-muted); font-size: .73rem; }
+.anpi-back {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  padding: .65rem 1rem;
+  border: .0625rem solid rgba(41, 46, 75, .18);
+  border-radius: 999px;
+  color: var(--anpi-navy);
+  text-decoration: none;
+  font-size: .82rem;
+  font-weight: 700;
+}
+.anpi-back:hover { border-color: var(--anpi-gold); background: rgba(221, 162, 50, .08); }
+.anpi-hero {
+  min-height: 34rem;
+  display: grid;
+  grid-template-columns: 1.25fr .75fr;
+  align-items: center;
+  gap: 4rem;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 5rem;
+}
+.anpi-hero-copy { max-width: 49rem; }
+.anpi-eyebrow { color: var(--anpi-gold-dark); font-size: .82rem; font-weight: 800; }
+.anpi-hero h1 {
+  margin-top: 1rem;
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  line-height: 1.12;
+  color: var(--anpi-navy);
+  text-wrap: balance;
+}
+.anpi-hero-copy > p {
+  max-width: 43rem;
+  margin-top: 1.5rem;
+  color: var(--anpi-muted);
+  font-size: 1.08rem;
+  line-height: 1.95;
+}
+.anpi-status {
+  width: fit-content;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  margin-top: 2rem;
+  padding: .8rem 1rem;
+  border: .0625rem solid rgba(221, 162, 50, .35);
+  border-radius: .8rem;
+  background: rgba(255, 255, 255, .62);
+  color: #6f531d;
+  font-size: .84rem;
+  font-weight: 700;
+}
+.anpi-status-dot { width: .65rem; height: .65rem; flex: none; border-radius: 50%; background: var(--anpi-gold); box-shadow: 0 0 0 .3rem rgba(221, 162, 50, .15); }
+.anpi-emblem { position: relative; display: grid; justify-items: center; gap: 1.25rem; text-align: center; }
+.anpi-emblem img {
+  position: relative;
+  width: min(18rem, 78vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  box-shadow: 0 1.5rem 5rem rgba(41, 46, 75, .12);
+}
+.anpi-emblem-halo { position: absolute; width: 21rem; height: 21rem; top: -1.5rem; border: .0625rem solid rgba(221, 162, 50, .35); border-radius: 50%; }
+.anpi-emblem-halo::before, .anpi-emblem-halo::after { content: ""; position: absolute; border-radius: 50%; background: var(--anpi-gold); }
+.anpi-emblem-halo::before { width: .8rem; height: .8rem; top: 2.6rem; left: 1.8rem; }
+.anpi-emblem-halo::after { width: .5rem; height: .5rem; right: .3rem; bottom: 4rem; }
+.anpi-emblem > span { color: var(--anpi-muted); font-size: .82rem; line-height: 1.6; font-weight: 700; }
+.anpi-bank {
+  padding: 5rem max(1.5rem, calc((100% - 73rem) / 2));
+  background: #fff;
+  border-block: .0625rem solid rgba(41, 46, 75, .09);
+}
+.anpi-section-heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+.anpi-section-heading > div > span { color: var(--anpi-gold-dark); font-weight: 800; font-size: .8rem; }
+.anpi-section-heading h2 { margin-top: .35rem; font-size: clamp(1.8rem, 4vw, 3rem); color: var(--anpi-navy); }
+.anpi-coming-soon { padding: .5rem .8rem; border-radius: 999px; background: rgba(221, 162, 50, .14); color: #7c5712; font-size: .75rem; font-weight: 800; }
+.anpi-bank-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  border: .0625rem solid rgba(41, 46, 75, .12);
+  border-radius: 1.25rem;
+  background: var(--anpi-ivory);
+}
+.anpi-bank-number { color: rgba(41, 46, 75, .16); font-family: 'Archivo', sans-serif; font-size: 3.5rem; font-weight: 800; }
+.anpi-bank-tag { color: var(--anpi-gold-dark); font-size: .72rem; font-weight: 800; }
+.anpi-bank-card h3 { margin-top: .3rem; color: var(--anpi-navy); font-size: 1.35rem; }
+.anpi-bank-card p { max-width: 48rem; margin-top: .55rem; color: var(--anpi-muted); line-height: 1.7; }
+.anpi-bank-card button { min-width: 6rem; padding: .8rem 1rem; border: 0; border-radius: .7rem; background: #d9d7d0; color: #747168; font-weight: 800; cursor: not-allowed; }
+.anpi-features {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 5rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+.anpi-features article { padding: 1.6rem; border-right: .18rem solid var(--anpi-gold); background: rgba(255, 255, 255, .5); }
+.anpi-features article > span { width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: 50%; background: var(--anpi-navy); color: #fff; font-size: 1.1rem; }
+.anpi-features h3 { margin-top: 1.1rem; color: var(--anpi-navy); font-size: 1.05rem; }
+.anpi-features p { margin-top: .55rem; color: var(--anpi-muted); font-size: .86rem; line-height: 1.75; }
+.anpi-footer { display: flex; justify-content: space-between; gap: 1rem; padding: 2rem max(1.5rem, calc((100% - 73rem) / 2)); background: var(--anpi-navy); color: rgba(255,255,255,.76); font-size: .78rem; }
+.anpi-footer a { color: #f2c15e; }
+
+:root[data-theme="dark"] .portal,
+:root[data-theme="dark"] .anpi-page { filter: brightness(.86) contrast(1.05); }
+
+@media (max-width: 52rem) {
+  .portal { align-content: start; padding-top: 6.5rem; }
+  .portal-choices { grid-template-columns: 1fr; max-width: 34rem; }
+  .anpi-hero { grid-template-columns: 1fr; gap: 3rem; padding-top: 2.5rem; text-align: center; }
+  .anpi-hero-copy { display: grid; justify-items: center; }
+  .anpi-emblem { order: -1; }
+  .anpi-emblem img { width: 13rem; }
+  .anpi-emblem-halo { width: 15.5rem; height: 15.5rem; top: -1.2rem; }
+  .anpi-features { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 35em) {
+  .portal { gap: 1.75rem; padding-inline: 1rem; }
+  .portal-intro h1 { font-size: 2.35rem; }
+  .portal-intro p { font-size: .95rem; }
+  .portal-choice { min-height: 0; grid-template-columns: 5.4rem 1fr; padding: 1.25rem; border-radius: 1.15rem; }
+  .portal-choice-ring { width: 5.4rem; height: 5.4rem; box-shadow: 0 0 0 .4rem rgba(0, 121, 107, .1); }
+  .portal-choice-anpi .portal-choice-ring { box-shadow: 0 0 0 .4rem rgba(221, 162, 50, .12); }
+  .portal-choice-copy strong { font-size: 1.2rem; }
+  .portal-choice-arrow { display: none; }
+  .anpi-nav { align-items: flex-start; padding-top: 1.25rem; }
+  .anpi-brand small { max-width: 10rem; }
+  .anpi-back { min-height: 2.5rem; font-size: .72rem; white-space: nowrap; }
+  .anpi-hero h1 { font-size: 2.35rem; }
+  .anpi-hero-copy > p { font-size: .95rem; }
+  .anpi-status { align-items: flex-start; text-align: right; line-height: 1.6; }
+  .anpi-bank { padding-block: 3.5rem; }
+  .anpi-section-heading { align-items: flex-start; }
+  .anpi-bank-card { grid-template-columns: 1fr; }
+  .anpi-bank-number { font-size: 2.5rem; }
+  .anpi-bank-card button { width: 100%; }
+  .anpi-footer { flex-direction: column; align-items: center; text-align: center; }
+}
+
 /* ---------- exam layout ---------- */
 .exam-wrap { min-height: 100%; padding: 1.5rem 1.25rem 9.375rem; max-width: 53.75rem; margin: 0 auto; }
 .exam-top { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 1.125rem; flex-wrap: wrap; padding-right: 3.5rem; }
