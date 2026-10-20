@@ -312,13 +312,42 @@ button:focus:not(:focus-visible), input:focus:not(:focus-visible), a:focus:not(:
   line-height: 1.9;
 }
 .portal-choices {
-  width: min(100%, 62rem);
+  width: min(100%, 44rem);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem;
+  gap: clamp(2rem, 8vw, 6rem);
   position: relative;
   z-index: 1;
 }
+.portal-circle {
+  --choice-accent: #00796b;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: .45rem;
+  color: var(--portal-navy);
+  text-decoration: none;
+}
+.portal-circle-logo {
+  width: clamp(11rem, 24vw, 16rem);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: .28rem solid var(--choice-accent);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 .8rem rgba(0, 121, 107, .1), 0 1.5rem 4rem rgba(37, 43, 73, .14);
+  transition: transform .22s ease, box-shadow .22s ease;
+}
+.portal-circle-logo img { width: 72%; height: 72%; object-fit: contain; }
+.portal-choice-anpi { --choice-accent: var(--portal-gold); }
+.portal-choice-anpi .portal-circle-logo { box-shadow: 0 0 0 .8rem rgba(221, 162, 50, .12), 0 1.5rem 4rem rgba(37, 43, 73, .14); }
+.portal-choice-anpi .portal-circle-logo img { width: 100%; height: 100%; }
+.portal-circle:hover .portal-circle-logo { transform: translateY(-.5rem) scale(1.025); box-shadow: 0 0 0 .95rem rgba(221, 162, 50, .12), 0 1.8rem 4.5rem rgba(37, 43, 73, .2); }
+.portal-choice-ofppt:hover .portal-circle-logo { box-shadow: 0 0 0 .95rem rgba(0, 121, 107, .1), 0 1.8rem 4.5rem rgba(37, 43, 73, .2); }
+.portal-circle strong { margin-top: 1.15rem; font-size: 1.35rem; }
+.portal-circle > span:last-child { color: #747789; font-size: .88rem; }
 .portal-choice {
   min-height: 15rem;
   display: grid;
@@ -502,7 +531,15 @@ button:focus:not(:focus-visible), input:focus:not(:focus-visible), a:focus:not(:
 .anpi-bank-tag { color: var(--anpi-gold-dark); font-size: .72rem; font-weight: 800; }
 .anpi-bank-card h3 { margin-top: .3rem; color: var(--anpi-navy); font-size: 1.35rem; }
 .anpi-bank-card p { max-width: 48rem; margin-top: .55rem; color: var(--anpi-muted); line-height: 1.7; }
-.anpi-bank-card button { min-width: 6rem; padding: .8rem 1rem; border: 0; border-radius: .7rem; background: #d9d7d0; color: #747168; font-weight: 800; cursor: not-allowed; }
+.anpi-bank-card button { min-width: 8rem; padding: .85rem 1rem; border: 0; border-radius: .7rem; background: var(--anpi-gold); color: var(--anpi-navy); font-weight: 800; cursor: pointer; }
+.anpi-bank-card button:hover:not(:disabled) { background: #c88a18; }
+.anpi-bank-card button:disabled { background: #d9d7d0; color: #747168; cursor: not-allowed; }
+.anpi-training-meta { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1rem; }
+.anpi-training-meta span { padding: .38rem .65rem; border-radius: 999px; background: rgba(221, 162, 50, .13); color: #765419; font-size: .72rem; font-weight: 800; }
+.anpi-name-field { max-width: 26rem; margin-top: 1.1rem; }
+.anpi-name-field label { display: block; margin-bottom: .35rem; color: var(--anpi-navy); font-size: .78rem; font-weight: 800; }
+.anpi-name-field input { width: 100%; min-height: 2.9rem; padding: .7rem .85rem; border: .1rem solid rgba(41, 46, 75, .16); border-radius: .65rem; background: #fff; color: var(--anpi-navy); font-family: inherit; font-size: .9rem; }
+.anpi-name-field input:focus { border-color: var(--anpi-gold); }
 .anpi-features {
   max-width: 76rem;
   margin: 0 auto;
@@ -517,6 +554,28 @@ button:focus:not(:focus-visible), input:focus:not(:focus-visible), a:focus:not(:
 .anpi-features p { margin-top: .55rem; color: var(--anpi-muted); font-size: .86rem; line-height: 1.75; }
 .anpi-footer { display: flex; justify-content: space-between; gap: 1rem; padding: 2rem max(1.5rem, calc((100% - 73rem) / 2)); background: var(--anpi-navy); color: rgba(255,255,255,.76); font-size: .78rem; }
 .anpi-footer a { color: #f2c15e; }
+
+.anpi-training { --heading: #292e4b; --teal: #dda232; --teal-dark: #292e4b; --teal-deep: #292e4b; }
+.anpi-exam-top { direction: rtl; }
+.anpi-exam-brand { display: flex; align-items: center; gap: .65rem; }
+.anpi-exam-brand img { width: 3.2rem; height: 3.2rem; border-radius: 50%; object-fit: cover; }
+.anpi-exam-brand span { display: grid; }
+.anpi-exam-brand strong { color: #292e4b; font-family: 'Archivo', sans-serif; font-size: 1.05rem; }
+.anpi-exam-brand small { color: var(--grey); font-size: .72rem; }
+.anpi-demo-notice { margin-bottom: 1rem; padding: .65rem .85rem; border: .0625rem solid rgba(221, 162, 50, .35); border-radius: .65rem; background: rgba(221, 162, 50, .1); color: #765419; font-size: .78rem; font-weight: 700; }
+.anpi-training .opt { text-align: right; }
+.anpi-training .progress-fill, .anpi-training .mini-fill { background: #dda232; }
+.anpi-exam-bar { background: #292e4b; }
+.anpi-timer { direction: ltr; }
+.anpi-timer.low { color: #b33a3a; border-color: #b33a3a; }
+.anpi-q-dots { justify-content: center; }
+.anpi-results-brand { align-items: center; gap: .75rem; }
+.anpi-results-brand img { width: 4rem; height: 4rem; border-radius: 50%; }
+.anpi-results-brand > div { display: grid; }
+.anpi-results-brand strong { color: #292e4b; font-family: 'Archivo', sans-serif; font-size: 1.2rem; }
+.anpi-results-brand span { color: var(--grey); font-size: .76rem; }
+.anpi-training .score-hero h1 { margin: .55rem 0 1rem; color: #292e4b; }
+.anpi-review { margin-top: 2rem; }
 
 :root[data-theme="dark"] .portal,
 :root[data-theme="dark"] .anpi-page { filter: brightness(.86) contrast(1.05); }
@@ -541,6 +600,11 @@ button:focus:not(:focus-visible), input:focus:not(:focus-visible), a:focus:not(:
   .portal-choice-anpi .portal-choice-ring { box-shadow: 0 0 0 .4rem rgba(221, 162, 50, .12); }
   .portal-choice-copy strong { font-size: 1.2rem; }
   .portal-choice-arrow { display: none; }
+  .portal-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.35rem; }
+  .portal-circle-logo { width: min(36vw, 9.5rem); box-shadow: 0 0 0 .45rem rgba(0, 121, 107, .1), 0 1rem 2.5rem rgba(37, 43, 73, .13); }
+  .portal-choice-anpi .portal-circle-logo { box-shadow: 0 0 0 .45rem rgba(221, 162, 50, .12), 0 1rem 2.5rem rgba(37, 43, 73, .13); }
+  .portal-circle strong { margin-top: .75rem; font-size: 1rem; }
+  .portal-circle > span:last-child { font-size: .72rem; }
   .anpi-nav { align-items: flex-start; padding-top: 1.25rem; }
   .anpi-brand small { max-width: 10rem; }
   .anpi-back { min-height: 2.5rem; font-size: .72rem; white-space: nowrap; }
@@ -552,6 +616,9 @@ button:focus:not(:focus-visible), input:focus:not(:focus-visible), a:focus:not(:
   .anpi-bank-card { grid-template-columns: 1fr; }
   .anpi-bank-number { font-size: 2.5rem; }
   .anpi-bank-card button { width: 100%; }
+  .anpi-name-field input { font-size: 16px; }
+  .anpi-exam-top { padding-left: 0; padding-right: 0; }
+  .anpi-training .exam-top-chips { width: 100%; }
   .anpi-footer { flex-direction: column; align-items: center; text-align: center; }
 }
 

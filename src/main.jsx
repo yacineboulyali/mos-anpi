@@ -44,6 +44,8 @@ const MySpace = lazyWithReload(() => import("./pages/MySpace.jsx"));
 const ExamenLogin = lazyWithReload(() => import("./pages/ExamenLogin.jsx"));
 const ExamenOfficiel = lazyWithReload(() => import("./pages/ExamenOfficiel.jsx"));
 const ExamenResultat = lazyWithReload(() => import("./pages/ExamenResultat.jsx"));
+const AnpiExam = lazyWithReload(() => import("./pages/AnpiExam.jsx"));
+const AnpiResults = lazyWithReload(() => import("./pages/AnpiResults.jsx"));
 
 function RouteLoading() {
   return (
@@ -64,6 +66,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/" element={<Portal />} />
           <Route path="/ofppt" element={<Login />} />
           <Route path="/anpi" element={<AnpiHome />} />
+          <Route path="/anpi/exam" element={<AnpiExam />} />
+          <Route path="/anpi/results" element={<AnpiResults />} />
           <Route path="/exam" element={<Exam />} />
           <Route path="/results" element={<Results />} />
           <Route path="/admin" element={<Admin />} />

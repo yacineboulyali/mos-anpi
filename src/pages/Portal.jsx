@@ -23,28 +23,20 @@ export default function Portal() {
       </header>
 
       <section className="portal-choices" aria-label="اختيار فضاء التدريب">
-        <Link className="portal-choice portal-choice-ofppt" to="/ofppt">
-          <span className="portal-choice-ring" aria-hidden="true">
+        <Link className="portal-circle portal-choice-ofppt" to="/ofppt">
+          <span className="portal-circle-logo" aria-hidden="true">
             <img src={ofpptLogo} alt="" />
           </span>
-          <span className="portal-choice-copy">
-            <span className="portal-choice-label">فضاء OFPPT</span>
-            <strong>اختبارات MOS</strong>
-            <span>Excel · Word · PowerPoint</span>
-          </span>
-          <span className="portal-choice-arrow" aria-hidden="true">←</span>
+          <strong>فضاء OFPPT</strong>
+          <span>اختبارات MOS</span>
         </Link>
 
-        <Link className="portal-choice portal-choice-anpi" to="/anpi">
-          <span className="portal-choice-ring" aria-hidden="true">
+        <Link className="portal-circle portal-choice-anpi" to="/anpi">
+          <span className="portal-circle-logo" aria-hidden="true">
             <img src={anpiLogo} alt="" />
           </span>
-          <span className="portal-choice-copy">
-            <span className="portal-choice-label">فضاء ANPI</span>
-            <strong>الامتحان المهني</strong>
-            <span>لأساتذة المعلوميات</span>
-          </span>
-          <span className="portal-choice-arrow" aria-hidden="true">←</span>
+          <strong>فضاء ANPI</strong>
+          <span>الامتحان المهني</span>
         </Link>
       </section>
 

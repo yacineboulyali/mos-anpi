@@ -1,6 +1,7 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import anpiLogo from "../assets/anpi-logo.png";
+import { ANPI_DURATION_MIN, ANPI_PASS_PCT, buildAnpiBank } from "../lib/anpiExam";
 
 const FEATURES = [
   {
@@ -21,9 +22,21 @@ const FEATURES = [
 ];
 
 export default function AnpiHome() {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const { total } = buildAnpiBank();
+
   useEffect(() => {
     document.title = "ANPI — التدريب على الامتحان المهني";
   }, []);
+
+  function startTraining() {
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    sessionStorage.setItem("anpi_candidate", JSON.stringify({ name: trimmedName, startedAt: Date.now() }));
+    sessionStorage.removeItem("anpi_last_result");
+    navigate("/anpi/exam");
+  }
 
   return (
     <main className="anpi-page" dir="rtl">
@@ -48,7 +61,7 @@ export default function AnpiHome() {
           </p>
           <div className="anpi-status" role="status">
             <span className="anpi-status-dot" aria-hidden="true" />
-            الهيكل جاهز — ننتظر نماذج الامتحانات لإطلاق بنك الأسئلة
+            نموذج تجريبي جاهز — الأسئلة غير رسمية ومخصصة لاختبار المنصة
           </div>
         </div>
 
@@ -65,7 +78,7 @@ export default function AnpiHome() {
             <span>بنك الأسئلة</span>
             <h2 id="anpi-bank-title">اختر نموذج التدريب</h2>
           </div>
-          <span className="anpi-coming-soon">قيد الإعداد</span>
+          <span className="anpi-coming-soon">نسخة تجريبية</span>
         </div>
 
         <article className="anpi-bank-card">
@@ -73,13 +86,26 @@ export default function AnpiHome() {
           <div>
             <span className="anpi-bank-tag">الامتحان المهني</span>
             <h3>نماذج أساتذة المعلوميات</h3>
-            <p>
-              ستظهر هنا سلاسل التدريب فور تحويل نماذج الامتحانات إلى أسئلة
-              متعددة الاختيارات مع الأجوبة والتفسيرات.
-            </p>
+            <p>اختبار تجريبي متعدد الاختيارات في الديداكتيك، التقويم، الأمن الرقمي والتدبير التربوي.</p>
+            <div className="anpi-training-meta">
+              <span>{total} سؤالًا</span>
+              <span>{ANPI_DURATION_MIN} دقيقة</span>
+              <span>عتبة النجاح {ANPI_PASS_PCT}%</span>
+            </div>
+            <div className="anpi-name-field">
+              <label htmlFor="anpi-name">الاسم الكامل</label>
+              <input
+                id="anpi-name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                onKeyDown={(event) => event.key === "Enter" && startTraining()}
+                placeholder="اكتب اسمك لبدء التدريب"
+                autoComplete="name"
+              />
+            </div>
           </div>
-          <button type="button" disabled aria-label="بنك الأسئلة قيد الإعداد">
-            قريبًا
+          <button type="button" disabled={!name.trim()} onClick={startTraining}>
+            ابدأ التدريب
           </button>
         </article>
       </section>

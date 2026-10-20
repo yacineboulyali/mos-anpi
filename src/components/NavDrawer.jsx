@@ -21,7 +21,7 @@ export default function NavDrawer() {
 
   // Masqué pendant l'examen officiel : aucune navigation ne doit être
   // possible tant que l'épreuve est en cours (voir ExamLockGuard).
-  if (["/", "/anpi", "/examen/epreuve"].includes(location.pathname)) return null;
+  if (location.pathname === "/" || location.pathname.startsWith("/anpi") || location.pathname === "/examen/epreuve") return null;
 
   function openDrawer() {
     setSession(getSession());
